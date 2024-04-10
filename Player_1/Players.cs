@@ -33,7 +33,7 @@ namespace Game
         {
             playingField = new PlayingField(splitContainer1.Panel1);
             playingField.Btms(3, 3);
-            
+
         }
 
 
@@ -58,7 +58,7 @@ namespace Game
                     label1.Text = "Not connecting";
                     return;
                 }
-                
+
             }
             Task.Run(() =>
             {
@@ -82,7 +82,7 @@ namespace Game
                         {
                             command = $"You {command}";
                         }
-                        
+
                         DialogResult result = MessageBox.Show(command, this.Text);
                         if (result == DialogResult.OK)
                         {
@@ -164,6 +164,16 @@ namespace Game
         {
             Players.Conn.SendMessenge("Clear");
             playingField.ClearField();
+        }
+
+        private void Btn_connected_MouseEnter(object sender, EventArgs e)
+        {
+            playingField.ButtonStyleEnter(sender, e);
+        }
+
+        private void Btn_connected_MouseLeave(object sender, EventArgs e)
+        {
+            playingField.ButtonStyleLeave(sender, e);
         }
     }
 }

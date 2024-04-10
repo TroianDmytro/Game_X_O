@@ -38,12 +38,28 @@ namespace Game.Controler
                     _panel.Controls.Add(buttons[i][j]);
                     //додае обробник подиї натискання на кнопку
                     buttons[i][j].Click += TicTocToe;
+                    buttons[i][j].MouseEnter += ButtonStyleEnter;
+                    buttons[i][j].MouseLeave += ButtonStyleLeave;
 
                     positionLeft += buttons[i][j].Size.Width;
                 }
                 positionTop += buttons[0][0].Size.Height;
                 positionLeft = 0;
             }
+        }
+
+        public void ButtonStyleEnter(object? sender, EventArgs e)
+        {
+            Button b = sender as Button;
+            b.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            b.FlatAppearance.BorderSize = 2;
+            b.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+        }
+
+        public void ButtonStyleLeave(object? sender, EventArgs e)
+        {
+            Button b = sender as Button;
+            b.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
         }
 
         // подія хід гравця

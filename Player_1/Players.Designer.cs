@@ -73,14 +73,19 @@
             // 
             // Btn_connected
             // 
+            Btn_connected.BackColor = SystemColors.Control;
+            Btn_connected.FlatAppearance.MouseOverBackColor = Color.Blue;
+            Btn_connected.FlatStyle = FlatStyle.Flat;
             Btn_connected.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 204);
             Btn_connected.Location = new Point(3, 13);
             Btn_connected.Name = "Btn_connected";
             Btn_connected.Size = new Size(94, 29);
             Btn_connected.TabIndex = 0;
             Btn_connected.Text = "Connect";
-            Btn_connected.UseVisualStyleBackColor = true;
+            Btn_connected.UseVisualStyleBackColor = false;
             Btn_connected.Click += Btn_connected_Click;
+            Btn_connected.MouseEnter += Btn_connected_MouseEnter;
+            Btn_connected.MouseLeave += Btn_connected_MouseLeave;
             // 
             // menuStrip1
             // 
@@ -104,7 +109,7 @@
             // newGameToolStripMenuItem
             // 
             newGameToolStripMenuItem.Name = "newGameToolStripMenuItem";
-            newGameToolStripMenuItem.Size = new Size(224, 28);
+            newGameToolStripMenuItem.Size = new Size(177, 28);
             newGameToolStripMenuItem.Text = "New game";
             newGameToolStripMenuItem.Click += newGameToolStripMenuItem_Click;
             // 
