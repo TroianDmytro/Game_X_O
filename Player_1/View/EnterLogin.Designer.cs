@@ -62,6 +62,7 @@
             Tb_login.Name = "Tb_login";
             Tb_login.Size = new Size(225, 34);
             Tb_login.TabIndex = 3;
+            Tb_login.TextChanged += Tb_login_TextChanged;
             // 
             // EnterLogin
             // 
@@ -88,6 +89,6 @@
 
         private Label label1;
         private Button Btn_Enter;
-        private TextBox Tb_login;
+        public TextBox Tb_login;
     }
 }

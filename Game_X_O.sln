@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{9A13BD94-7939-47CC-BFBE-0034E8FD8E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{9A13BD94-7939-47CC-BFBE-0034E8FD8E18}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cours", "Cours\Cours.csproj", "{A4FBA29D-5CB1-4D83-8BE1-BEBECDB3CE27}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyUsers", "MyUsers\MyUsers.csproj", "{7764F0F8-C3B1-4185-8145-11C9A150AAA4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Player", "Player_1\Player.csproj", "{537A6702-881C-47FB-8A1C-FA72E2522479}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyConnected", "MyConnected\MyConnected.csproj", "{2C226CBE-2327-45A2-B752-E958A4A3C5DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{537A6702-881C-47FB-8A1C-FA72E2522479}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{537A6702-881C-47FB-8A1C-FA72E2522479}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{537A6702-881C-47FB-8A1C-FA72E2522479}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C226CBE-2327-45A2-B752-E958A4A3C5DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C226CBE-2327-45A2-B752-E958A4A3C5DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C226CBE-2327-45A2-B752-E958A4A3C5DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C226CBE-2327-45A2-B752-E958A4A3C5DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

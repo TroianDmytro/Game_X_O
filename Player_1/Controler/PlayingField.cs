@@ -4,9 +4,13 @@ namespace Game.Controler
 {
     public class PlayingField
     {
+        //масив кнопок з яких складается поле
         List<List<Button>> buttons = new List<List<Button>>();
+        // панель на якій буде поле для гри
         Panel _panel;
+        //поточний гравець
         public PlayerCours currentPlayer;
+
         public PlayingField( Panel p)
         {
             _panel = p;
@@ -76,7 +80,7 @@ namespace Game.Controler
                 currentPlayer.PlayerIndex = Players.P;
 
                 string strMsg = currentPlayer.WriteToJSON();
-                Players.Conn.SendMessenge(strMsg);
+                Players.Conn.SendMessenge(Players.SocketPlayer, strMsg);
 
                 _panel.Enabled = false;
             }

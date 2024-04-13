@@ -9,7 +9,7 @@ using MyUsers;
 const int PORT_ADDR = 4000;
 IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, PORT_ADDR);
 List<Room> rooms = new List<Room>();
-
+MyConnected.ConnectingToServer connecting = new MyConnected.ConnectingToServer();
 
 using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
 {
@@ -21,30 +21,40 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
     ColorMessage("Server Start", colorServer);
     rooms.Add(new Room());
 
-    while (true)
+    try
     {
-        Thread thread = new Thread(() => Method(serverSocket));
-        thread.Start();
+        while (true)
+        {
+            Method(serverSocket, rooms.Count);
+            //Thread thread = new Thread(() => Method(serverSocket, rooms.Count));
+            //thread.Start();
 
-        while (rooms.Last().UsersList.Count < 2) { Thread.Sleep(10); }
+            if (rooms.Count > 0)
+            {
+                while (rooms.Last().UsersList.Count < 2) { Thread.Sleep(10); }
+            }
 
-        ColorMessage("Create Room", colorServer);
-        rooms.Add(new Room());
+            ColorMessage("Create Room", colorServer);
+            rooms.Add(new Room());
+        }
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine("try catch #1");
+        ColorMessage(ex.Message, ConsoleColor.Red);
+    }
+   
 
-    void Method(Socket servSocket)
+    void Method(Socket servSocket,int indexRoom)
     {
         ConsoleColor colorUser_1 = ConsoleColor.Green;
         ConsoleColor colorUser_2 = ConsoleColor.Blue;
 
         FieldGame fieldGame = new FieldGame();
-
+        // Player 1 connecting
         Socket client_A = servSocket.Accept();
-        /////////////////////////////////////////////////////////////////
-        byte[] bufferUser_1 = new byte[1024];
-        int size = client_A.Receive(bufferUser_1);
-        //////////////////////////////// Player_1
-        MyUsers.User user_1 = new User(Encoding.Unicode.GetString(bufferUser_1, 0, size), client_A);//////
+
+        MyUsers.User user_1 = new User(connecting.GetMessenge(client_A), client_A);
         rooms.Last().AddToRoom(user_1);
 
         PlayerCours user_1Cours = new PlayerCours();
@@ -55,15 +65,12 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
         user_1Cours.ServerCommandLine = strConnectPlayer + " 1";
         ColorMessage(user_1Cours.ToString(), colorUser_1);
 
-        user_1.Socket.Send(Encoding.Unicode.GetBytes(user_1Cours.WriteToJSON()));
+        connecting.SendMessenge(user_1.Socket,user_1Cours.WriteToJSON());
 
-
+        // Player 2 connecting
         Socket client_B = servSocket.Accept();
-        //////////////////////////////////////////////
-        byte[] bufferUser_2 = new byte[1024];
-        size = client_B.Receive(bufferUser_2);
-        //MyUsers.User user_2 = new User("Player_2", client_B);
-        MyUsers.User user_2 = new User(Encoding.Unicode.GetString(bufferUser_2, 0, size), client_B);
+        
+        MyUsers.User user_2 = new User(connecting.GetMessenge(client_B), client_B);
 
         rooms.Last().AddToRoom(user_2);
 
@@ -73,25 +80,26 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
 
         user_2Cours.ServerCommandLine = strConnectPlayer + " 2";
         ColorMessage(user_2Cours.ToString(), colorUser_2);
-        user_2.Socket.Send(Encoding.Unicode.GetBytes(user_2Cours.WriteToJSON()));
+        connecting.SendMessenge(user_2.Socket,user_2Cours.WriteToJSON());
 
+        user_1Cours.ServerCommandLine = "true";
+        ColorMessage($"Player_1 <- {user_1Cours.WriteToJSON()}", colorUser_1);
+        connecting.SendMessenge(user_1.Socket,user_1Cours.WriteToJSON());
 
-        ColorMessage($"Player_1 <- {user_2Cours.WriteToJSON()}", colorUser_1);
-        user_1.Socket.Send(Encoding.Unicode.GetBytes(user_2Cours.WriteToJSON()));
-
-        string messageFromUser_1 = string.Empty;
-        string messageFromUser_2 = string.Empty;
+        string messageFromUser_1;
+        string messageFromUser_2;
 
         while (true)
         {
+            messageFromUser_1 = string.Empty;
+            messageFromUser_2 = string.Empty;
+            bool clear = false;
+
             try
             {
                 ColorMessage("waiting messange from Player_1", colorServer);
-                ///////////////
-                bufferUser_1 = new byte[1024];
-                size = user_1.Socket.Receive(bufferUser_1);
-                /////////////
-                messageFromUser_1 = Encoding.Unicode.GetString(bufferUser_1, 0, size);
+                
+                messageFromUser_1 = connecting.GetMessenge(user_1.Socket);
                 ColorMessage($"Player_1 -> {messageFromUser_1}", colorUser_1);
 
                 user_1Cours = user_1Cours.ReadWithJSON(messageFromUser_1);
@@ -103,11 +111,14 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
 
                     user_1Cours.ServerCommandLine = "Loss";
                     messageFromUser_2 = user_1Cours.WriteToJSON();
+                    clear = true;
+                    
                 }
                 else if (fieldGame.IsFull())//перевіряе чи не заповнене поле
                 {
                     messageFromUser_1 = user_1Cours.ServerCommandLine = "Game Over";
                     messageFromUser_2 = user_1Cours.WriteToJSON();
+                    clear = true;
                 }
                 else
                 {
@@ -117,26 +128,25 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
                     messageFromUser_2 = user_1Cours.WriteToJSON();
                 }
 
-                user_1.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_1));
+                //user_1.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_1));
+                connecting.SendMessenge(user_1.Socket, messageFromUser_1);
                 ColorMessage($"Player_1 <- {messageFromUser_1}", colorUser_1);
 
-                user_2.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_2));
+                //user_2.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_2));
+                connecting.SendMessenge(user_2.Socket, messageFromUser_2);
                 ColorMessage($"Player_2 <- {messageFromUser_2}", colorUser_2);
 
-
+                if (clear)
+                {
+                    fieldGame.CreateField();
+                    continue;
+                }
                 ///////////////////////////////////////////////
 
                 ColorMessage("waiting messange from Player_2", colorServer);
 
-                //byte[] bufferUser_2 = new byte[1024];
-                //int size = user_2.Socket.Receive(bufferUser_2);
-                bufferUser_2 = new byte[1024];
-                size = user_2.Socket.Receive(bufferUser_2);
-
-
-                messageFromUser_2 = Encoding.Unicode.GetString(bufferUser_2, 0, size);
+                messageFromUser_2 = connecting.GetMessenge(user_2.Socket);
                 ColorMessage($"Player_2 -> {messageFromUser_2}", colorUser_2);
-
 
                 user_2Cours = user_2Cours.ReadWithJSON(messageFromUser_2);
                 fieldGame.RecordInField(user_2Cours.Index_Y, user_2Cours.Index_X, user_2Cours.PlayerSimbol);
@@ -147,11 +157,13 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
                     messageFromUser_1 = user_2Cours.WriteToJSON();
 
                     messageFromUser_2 = "Win";
+                    clear = true;
                 }
                 else if (fieldGame.IsFull())//перевіряе чи не заповнене поле
                 {
                     user_2Cours.ServerCommandLine = messageFromUser_2 = "Game Over";
                     messageFromUser_1 = user_2Cours.WriteToJSON();
+                    clear = true;
                 }
                 else
                 {
@@ -160,38 +172,35 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
                     messageFromUser_2 = "false";
                 }
 
-                user_2.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_2));
+                //user_2.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_2));
+                connecting.SendMessenge(user_2.Socket, messageFromUser_2);
+
                 ColorMessage($"Player_2 <- {messageFromUser_2}", colorUser_2);
 
-                user_1.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_1));
+                //user_1.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_1));
+                connecting.SendMessenge(user_1.Socket, messageFromUser_1);
                 ColorMessage($"Player_1 <- {messageFromUser_1}", colorUser_1);
 
+                if (clear)
+                {
+                    fieldGame.CreateField();
+                }
             }
             catch (Exception ex)
             {
-                if (messageFromUser_1.Equals("Clear") || messageFromUser_2.Equals("Clear"))
-                {
-                    ColorMessage("Catch if Clear", colorServer);
-                    //user_1.Socket.Send(Encoding.Unicode.GetBytes("Clear"));
-                    ColorMessage("Player_1 <- Clear", colorUser_1);
-                    Task.Delay(10);
-                    //user_2.Socket.Send(Encoding.Unicode.GetBytes("Clear"));
-                    ColorMessage("Player_2 <- Clear", colorUser_2);
-
-                    fieldGame.ClearField();
-
-                    //user_1.Socket.Send(Encoding.Unicode.GetBytes("true"));
-                    //ColorMessage("Player_1 <- true", colorUser_1);
-
-                    //user_2.Socket.Send(Encoding.Unicode.GetBytes("false"));
-                    //ColorMessage("Player_2 <- false", colorUser_2);
-
-                    continue;
-                }
-
                 ColorMessage(ex.Message, ConsoleColor.Red);
-                Console.ReadLine();
-                continue;
+                if (user_1.Socket.Connected)
+                {
+                    user_1.Socket.Shutdown(SocketShutdown.Both);
+                    user_1.Socket.Close();
+                }
+                if (user_2.Socket.Connected)
+                {
+                    user_2.Socket.Shutdown(SocketShutdown.Both);
+                    user_2.Socket.Close();
+                }
+                rooms.RemoveAt(--indexRoom);
+                return;
             }
 
         }
@@ -203,7 +212,7 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
         Console.WriteLine(msg);
         Console.ResetColor();
     }
-}  
+}
 
 
 

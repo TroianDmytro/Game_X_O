@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cours\Cours.csproj" />
+    <ProjectReference Include="..\MyConnected\MyConnected.csproj" />
     <ProjectReference Include="..\MyUsers\MyUsers.csproj" />
   </ItemGroup>
 

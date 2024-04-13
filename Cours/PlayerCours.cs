@@ -4,12 +4,17 @@ namespace Cours
 {
     public class PlayerCours
     {
+        // логін
         public string PlayerLogin {  get; set; }
+        // індекс гравця, 1 або 2
         public int PlayerIndex { get; set; }
+        // координата ходу по У
         public int Index_Y { get; set; }
+        // координата ходу по Х
         public int Index_X { get; set; }
+        //символ який відображается на полі при ході
         public char PlayerSimbol { get; set; }
-
+        // команда яка передается від сервера або від гравця на сервер
         public string ServerCommandLine { get; set; }
         public PlayerCours()
         {
@@ -20,7 +25,7 @@ namespace Cours
             PlayerSimbol = '0';
             ServerCommandLine = string.Empty;
         }
-
+        // записує хід в json формат
         public string WriteToJSON()
         {
             if (this != null)
@@ -30,6 +35,7 @@ namespace Cours
             return string.Empty;
         }
 
+        //считує хід з json формату
         public PlayerCours? ReadWithJSON(string strJSON)
         {
             var tempObj = JsonSerializer.Deserialize<PlayerCours>(strJSON);

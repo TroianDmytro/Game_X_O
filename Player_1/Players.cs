@@ -7,17 +7,18 @@ using System.Windows.Forms;
 using Cours;
 using Player.View;
 using Microsoft.VisualBasic.Logging;
+using MyConnected;
 
 
 namespace Game
 {
     public partial class Players : Form
     {
-        //const string IP_SERVER_ADDR = "127.0.0.1";
-        //const int PORT_SERVER_ADDR = 4000;
-        public Socket socket;
-        public static ConnectingToServer Conn { get; private set; }
+        public static Socket? SocketPlayer {  get; private set ; }
+        public static ConnectingToServer? Conn { get; private set; }
+
         PlayingField playingField;
+
         public PlayerCours playerCours;
         public static int P { get; private set; }
         EnterLogin login;
@@ -43,23 +44,31 @@ namespace Game
             newGameToolStripMenuItem.Enabled = false;
             Btn_connected.Enabled = false;
             label1.Text = "Wait connecting...";
+
             if (Conn == null)
             {
                 Conn = new ConnectingToServer();
 
-                if (Conn.Connecting())
-                {
-                    label1.Text = "You connecting.";
-                    login = new EnterLogin(this);
-                    login.ShowDialog();
-                }
-                else
-                {
-                    label1.Text = "Not connecting";
-                    return;
-                }
+                login = new EnterLogin(this);
+                login.ShowDialog();
 
+                if ((SocketPlayer = Conn.ConnectingToServ())!=null)
+                {
+                    if(Players.Conn.SendMessenge(SocketPlayer, playerCours.PlayerLogin))
+                    {
+                        label1.Text = "You connecting.";
+                    }
+                    else
+                    {
+                        label1.Text = "Not connecting";
+                        Conn.DisconnectingFromServer(SocketPlayer);
+                        Conn = null;
+                        Btn_connected.Enabled = true;
+                        return;
+                    }
+                }
             }
+
             Task.Run(() =>
             {
                 string command = string.Empty;
@@ -67,7 +76,8 @@ namespace Game
                 {
                     try
                     {
-                        command = Players.Conn.GetMessenge();
+                        command = Players.Conn.GetMessenge(Players.SocketPlayer);
+
                         playerCours = playerCours.ReadWithJSON(command);
 
                         command = playerCours.ServerCommandLine;
@@ -83,10 +93,10 @@ namespace Game
                             command = $"You {command}";
                         }
 
-                        DialogResult result = MessageBox.Show(command, this.Text);
+                        DialogResult result = MessageBox.Show(command, login.Tb_login.Text);
                         if (result == DialogResult.OK)
                         {
-                            Conn.SendMessenge("Clear");
+                            //Conn.SendMessenge(Players.SocketPlayer, "Clear");------
                             playingField.ClearField();
                             if (Players.P == 1)
                             {
@@ -120,10 +130,10 @@ namespace Game
                             playerCours.PlayerSimbol = 'X';
                             this.Text = playerCours.PlayerLogin + " your X";
                             playingField.currentPlayer = playerCours;
+                            label1.Text += "Wait Player 2";
                         });
                     }
-
-                    if (command.Equals("Connect Player 2") && Players.P == 0)
+                    else if (command.Equals("Connect Player 2") && Players.P == 0)
                     {
                         Action action = () =>
                         {
@@ -135,14 +145,6 @@ namespace Game
                         };
                         Invoke(action);
                     }
-                    else if (command.Equals("Connect Player 2"))
-                    {
-                        Action action = () =>
-                        {
-                            this.splitContainer1.Panel1.Enabled = true;
-                        };
-                        Invoke(action);
-                    }
                 };
             });
         }
@@ -151,7 +153,7 @@ namespace Game
         {
             if (Conn != null)
             {
-                Conn.DisconnectingFromServer();
+                Conn.DisconnectingFromServer(Players.SocketPlayer);
             }
         }
 
@@ -162,7 +164,7 @@ namespace Game
 
         private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Players.Conn.SendMessenge("Clear");
+            Players.Conn.SendMessenge(Players.SocketPlayer, "Clear");
             playingField.ClearField();
         }
 

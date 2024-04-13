@@ -67,9 +67,9 @@
             label1.Font = new Font("Segoe UI Semibold", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 204);
             label1.Location = new Point(24, 323);
             label1.Name = "label1";
-            label1.Size = new Size(53, 23);
+            label1.Size = new Size(180, 23);
             label1.TabIndex = 0;
-            label1.Text = "label1";
+            label1.Text = "Welcome to the game";
             // 
             // Btn_connected
             // 
