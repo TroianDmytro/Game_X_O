@@ -77,7 +77,7 @@ namespace Game.Controler
                 currentPlayer.Index_Y = int.Parse(b.Name.Split(' ').First());
                 currentPlayer.Index_X = int.Parse(b.Name.Split(' ').Last());
                 b.Enabled = false;
-                currentPlayer.PlayerIndex = Players.P;
+                currentPlayer.PlayerIndex = Players.PlayerNumber;
 
                 string strMsg = currentPlayer.WriteToJSON();
                 Players.Conn.SendMessenge(Players.SocketPlayer, strMsg);

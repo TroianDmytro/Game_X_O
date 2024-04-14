@@ -9,7 +9,9 @@ namespace MyConnected
         const int PORT_SERVER_ADDR = 4000;
         Socket socket;
 
-        public ConnectingToServer() { }
+        public ConnectingToServer() 
+        { 
+        }
 
         public Socket ConnectingToServ()
         {

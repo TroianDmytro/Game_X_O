@@ -44,20 +44,6 @@ namespace MyUsers
 
         }
 
-        #region RecordInField(MyUsers.User player)
-        //public void RecordInField(MyUsers.User player)
-        //{
-        //    if (!IsFull())
-        //    {
-        //        if (!char.IsSymbol(field[player.Index_Y, player.Index_X]))
-        //        {
-        //            field[player.Index_Y, player.Index_X] = player.PlayerSimbol;
-        //        }
-        //    }
-
-        //}
-# endregion RecordInField(MyUsers.User player)
-
         // перевіряе хід на виграш
         public bool IsWin(char ch)
         {
@@ -114,18 +100,10 @@ namespace MyUsers
             }
             if (winDiagonal)
             {
-                //MessageBox.Show(b.Text + "- WIN", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                //_form.Text = b.Text + "- WIN";
-                //Enabl(buttons);
                 return winDiagonal;
             }
             if (rightDiagonal)
             {
-                //MessageBox.Show(b.Text + "- WIN", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                //_form.Text = b.Text + "- WIN";
-                //Enabl(buttons);
                 return rightDiagonal;
             }
             return false;

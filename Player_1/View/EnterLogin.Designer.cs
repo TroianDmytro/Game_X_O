@@ -68,6 +68,7 @@
             // 
             AutoScaleDimensions = new SizeF(12F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.RoyalBlue;
             ClientSize = new Size(320, 102);
             Controls.Add(Tb_login);
             Controls.Add(Btn_Enter);
@@ -79,7 +80,7 @@
             Name = "EnterLogin";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "EnterLogin";
+            Text = "Registration";
             FormClosing += EnterLogin_FormClosing;
             Load += EnterLogin_Load;
             ResumeLayout(false);

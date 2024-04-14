@@ -19,7 +19,7 @@ namespace Game
         PlayingField playingField;
 
         public PlayerCours playerCours;
-        public static int P { get; private set; }
+        public static int PlayerNumber { get; private set; }
         EnterLogin login;
 
         public Players()
@@ -27,7 +27,7 @@ namespace Game
             InitializeComponent();
             this.splitContainer1.Panel1.Enabled = false;
             playerCours = new PlayerCours();
-            Conn = new ConnectingToServer();
+            
 
             login = new EnterLogin(this);
 
@@ -46,6 +46,7 @@ namespace Game
         {
             newGameToolStripMenuItem.Enabled = false;
             Btn_connected.Enabled = false;
+            Conn = new ConnectingToServer();
 
             if (Conn == null || SocketPlayer == null)
             {
@@ -70,13 +71,14 @@ namespace Game
                     {
                         label1.Text = "Not connecting";
                         Conn.DisconnectingFromServer(SocketPlayer);
-                        Conn = null;
                         Btn_connected.Enabled = true;
+                        SocketPlayer = null;
                         return;
                     }
                 }
             }
 
+            // обробка команд з сервера
             Task.Run(() =>
             {
                 string command = string.Empty;
@@ -104,9 +106,8 @@ namespace Game
                         DialogResult result = MessageBox.Show(command, login.Tb_login.Text);
                         if (result == DialogResult.OK)
                         {
-                            //Conn.SendMessenge(Players.SocketPlayer, "Clear");------
                             playingField.ClearField();
-                            if (Players.P == 1)
+                            if (Players.PlayerNumber == 1)
                             {
                                 splitContainer1.Panel1.Enabled = true;
                             }
@@ -135,28 +136,34 @@ namespace Game
                         {
                             label1.Text = "Disconnecting.";
                             Conn.DisconnectingFromServer(SocketPlayer);
-                            splitContainer1.Panel1.Enabled = true;
-                            return;
+
+                            var resultMessage = MessageBox.Show("There was an error connecting tothe server. Maybe the opponent has disconnected from the server.", "",
+                                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                            playingField.ClearField();
+                            SocketPlayer = null;
+                            Btn_connected.Enabled = true;
                         };
                         Invoke(action);
+                        return;
                     }
 
                     if (command.Equals("Connect Player 1"))
                     {
                         Invoke(() =>
                         {
-                            P = 1;
+                            PlayerNumber = 1;
                             playerCours.PlayerSimbol = 'X';
                             this.Text = playerCours.PlayerLogin + " your X";
                             playingField.currentPlayer = playerCours;
                             label1.Text += "Wait Player 2";
                         });
                     }
-                    else if (command.Equals("Connect Player 2") && Players.P == 0)
+                    else if (command.Equals("Connect Player 2") && Players.PlayerNumber == 0)
                     {
                         Action action = () =>
                         {
-                            P = 2;
+                            PlayerNumber = 2;
                             playerCours.PlayerSimbol = 'O';
                             this.Text = playerCours.PlayerLogin + " your O";
                             playingField.currentPlayer = playerCours;
