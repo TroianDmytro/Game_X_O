@@ -25,9 +25,8 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
     {
         while (true)
         {
-            Method(serverSocket, rooms.Count);
-            //Thread thread = new Thread(() => Method(serverSocket, rooms.Count));
-            //thread.Start();
+            Thread thread = new Thread(() => Method(serverSocket, rooms.Count));
+            thread.Start();
 
             if (rooms.Count > 0)
             {
@@ -44,7 +43,7 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
         ColorMessage(ex.Message, ConsoleColor.Red);
     }
    
-
+    // метод обробки одниєї ігрової кімнати
     void Method(Socket servSocket,int indexRoom)
     {
         ConsoleColor colorUser_1 = ConsoleColor.Green;
@@ -93,7 +92,7 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
         {
             messageFromUser_1 = string.Empty;
             messageFromUser_2 = string.Empty;
-            bool clear = false;
+            bool clear = false;// визначає потрибно очищувати ігрове поле чи ні (true - так, false - ні)
 
             try
             {
@@ -104,6 +103,7 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
 
                 user_1Cours = user_1Cours.ReadWithJSON(messageFromUser_1);
                 fieldGame.RecordInField(user_1Cours.Index_Y, user_1Cours.Index_X, user_1Cours.PlayerSimbol);
+
                 // якщо IsWin = true відправляе повідомлення про кінець гри
                 if (fieldGame.IsWin(user_1Cours.PlayerSimbol))
                 {
@@ -128,11 +128,9 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
                     messageFromUser_2 = user_1Cours.WriteToJSON();
                 }
 
-                //user_1.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_1));
                 connecting.SendMessenge(user_1.Socket, messageFromUser_1);
                 ColorMessage($"Player_1 <- {messageFromUser_1}", colorUser_1);
 
-                //user_2.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_2));
                 connecting.SendMessenge(user_2.Socket, messageFromUser_2);
                 ColorMessage($"Player_2 <- {messageFromUser_2}", colorUser_2);
 
@@ -172,12 +170,10 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
                     messageFromUser_2 = "false";
                 }
 
-                //user_2.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_2));
                 connecting.SendMessenge(user_2.Socket, messageFromUser_2);
 
                 ColorMessage($"Player_2 <- {messageFromUser_2}", colorUser_2);
 
-                //user_1.Socket.Send(Encoding.Unicode.GetBytes(messageFromUser_1));
                 connecting.SendMessenge(user_1.Socket, messageFromUser_1);
                 ColorMessage($"Player_1 <- {messageFromUser_1}", colorUser_1);
 
@@ -191,15 +187,30 @@ using (Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.S
                 ColorMessage(ex.Message, ConsoleColor.Red);
                 if (user_1.Socket.Connected)
                 {
+                    connecting.SendMessenge(user_1.Socket, "Disconnecting");
                     user_1.Socket.Shutdown(SocketShutdown.Both);
                     user_1.Socket.Close();
+                    ColorMessage("user_1 Disconect", colorUser_1);
                 }
+                else
+                {
+                    ColorMessage("user_1 Disconect", colorUser_1);
+                }
+
                 if (user_2.Socket.Connected)
                 {
+                    connecting.SendMessenge(user_2.Socket, "Disconnecting");
                     user_2.Socket.Shutdown(SocketShutdown.Both);
                     user_2.Socket.Close();
+                    ColorMessage("user_2 Disconect", colorUser_2);
                 }
+                else
+                {
+                    ColorMessage("user_2 Disconect", colorUser_2);
+                }
+
                 rooms.RemoveAt(--indexRoom);
+                ColorMessage("room delete", colorServer);
                 return;
             }
 

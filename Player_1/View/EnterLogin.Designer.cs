@@ -60,9 +60,9 @@
             Tb_login.Location = new Point(84, 9);
             Tb_login.MaxLength = 16;
             Tb_login.Name = "Tb_login";
+            Tb_login.PlaceholderText = "Enter login";
             Tb_login.Size = new Size(225, 34);
             Tb_login.TabIndex = 3;
-            Tb_login.TextChanged += Tb_login_TextChanged;
             // 
             // EnterLogin
             // 
@@ -80,6 +80,7 @@
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "EnterLogin";
+            FormClosing += EnterLogin_FormClosing;
             Load += EnterLogin_Load;
             ResumeLayout(false);
             PerformLayout();

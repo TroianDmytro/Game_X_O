@@ -29,12 +29,12 @@ namespace Player.View
         private void Btn_Enter_Click(object sender, EventArgs e)
         {
             mainForm.playerCours.PlayerLogin = Tb_login.Text;
-            //Task.Run(() =>
-            //{
-            //    Players.Conn.SendMessenge(mainForm.playerCours.PlayerLogin);
-            //});
-            //Task.WaitAll();
-            Close();
+            
+            if (!string.IsNullOrEmpty(mainForm.playerCours.PlayerLogin))
+            {
+                Close();
+            }
+
         }
 
         private void EnterLogin_Load(object sender, EventArgs e)
@@ -42,9 +42,9 @@ namespace Player.View
 
         }
 
-        private void Tb_login_TextChanged(object sender, EventArgs e)
+        private void EnterLogin_FormClosing(object sender, FormClosingEventArgs e)
         {
-
+            //mainForm.playerCours.PlayerLogin = string.Empty;
         }
     }
 }

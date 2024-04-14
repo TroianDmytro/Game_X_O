@@ -127,7 +127,7 @@
             Name = "Players";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Players";
+            Text = "Tic Toc Toe";
             FormClosing += Player_FormClosing;
             Load += Player_Load;
             splitContainer1.Panel1.ResumeLayout(false);

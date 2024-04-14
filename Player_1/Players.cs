@@ -1,7 +1,6 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Net;
-using Game.Model;
 using Game.Controler;
 using System.Windows.Forms;
 using Cours;
@@ -28,6 +27,9 @@ namespace Game
             InitializeComponent();
             this.splitContainer1.Panel1.Enabled = false;
             playerCours = new PlayerCours();
+            Conn = new ConnectingToServer();
+
+            login = new EnterLogin(this);
 
         }
         private void Player_Load(object sender, EventArgs e)
@@ -35,6 +37,7 @@ namespace Game
             playingField = new PlayingField(splitContainer1.Panel1);
             playingField.Btms(3, 3);
 
+            
         }
 
 
@@ -43,18 +46,23 @@ namespace Game
         {
             newGameToolStripMenuItem.Enabled = false;
             Btn_connected.Enabled = false;
-            label1.Text = "Wait connecting...";
 
-            if (Conn == null)
+            if (Conn == null || SocketPlayer == null)
             {
-                Conn = new ConnectingToServer();
-
-                login = new EnterLogin(this);
+               
                 login.ShowDialog();
+
+                if(string.IsNullOrEmpty(playerCours.PlayerLogin))
+                {
+                    Btn_connected.Enabled = true;
+                    return;
+                }
 
                 if ((SocketPlayer = Conn.ConnectingToServ())!=null)
                 {
-                    if(Players.Conn.SendMessenge(SocketPlayer, playerCours.PlayerLogin))
+                    label1.Text = "Wait connecting...";
+
+                    if (Players.Conn.SendMessenge(SocketPlayer, playerCours.PlayerLogin))
                     {
                         label1.Text = "You connecting.";
                     }
@@ -118,6 +126,17 @@ namespace Game
                         Action action = () =>
                         {
                             label1.Text = "Opponent`s move.";
+                        };
+                        Invoke(action);
+                    }
+                    else if(command.Equals("Disconnecting"))
+                    {
+                        Action action = () =>
+                        {
+                            label1.Text = "Disconnecting.";
+                            Conn.DisconnectingFromServer(SocketPlayer);
+                            splitContainer1.Panel1.Enabled = true;
+                            return;
                         };
                         Invoke(action);
                     }
